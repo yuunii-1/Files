@@ -1,135 +1,225 @@
--- GUI Pet Randomizer with ESP toggle
--- Made by - Minami
+--// Pet Randomizer UI (Minami) - matches screenshot layout //--
 
--- Services
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 
--- Variables
-local randomizerActive = false
-local countdown = 0
-local espActive = false
-
--- Functions
-local function sendNotification(title, text, duration)
-    StarterGui:SetCore("SendNotification", {
-        Title = title;
-        Text = text;
-        Duration = duration or 3;
-    })
+local function notify(title, text, duration)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = duration or 3
+        })
+    end)
 end
 
--- Create ScreenGui
+--==== GUI =====================================================
+
 local gui = Instance.new("ScreenGui")
-gui.Name = "PetRandomizerGUI"
+gui.Name = "MinamiPetRand_" .. math.random(1000,9999)
 gui.ResetOnSpawn = false
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.IgnoreGuiInset = true
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- Main Frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 200)
-frame.Position = UDim2.new(0.7, 0, 0.4, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.Active = true
-frame.Draggable = true
-frame.Parent = gui
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0, 280, 0, 270)
+panel.Position = UDim2.new(0.05, 0, 0.28, 0)
+panel.BackgroundColor3 = Color3.fromRGB(25,25,25)
+panel.BackgroundTransparency = 0.35 -- translucent like your picture
+panel.Active, panel.Draggable = true, true
+panel.Parent = gui
+Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
 
--- Title
+-- Title bar
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundTransparency = 0.3
-title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-title.Text = "Pet Randomizer GUI"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 20
-title.Parent = frame
+title.Size = UDim2.new(1, 0, 0, 48)
+title.BackgroundColor3 = Color3.fromRGB(255,140,0)
+title.Text = "  Pet Randomizer ✨"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = panel
+Instance.new("UICorner", title).CornerRadius = UDim.new(0, 12)
 
--- Pet Randomizer Button
-local petButton = Instance.new("TextButton")
-petButton.Size = UDim2.new(1, -20, 0, 50)
-petButton.Position = UDim2.new(0, 10, 0, 50)
-petButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-petButton.Text = "Pet Randomizer"
-petButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-petButton.Font = Enum.Font.SourceSansBold
-petButton.TextSize = 18
-petButton.Parent = frame
+-- credit (small)
+local credit = Instance.new("TextLabel")
+credit.Size = UDim2.new(1, -20, 0, 18)
+credit.Position = UDim2.new(0, 10, 0, 50)
+credit.BackgroundTransparency = 1
+credit.Text = "Made by - Minami"
+credit.TextColor3 = Color3.fromRGB(230,230,230)
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 14
+credit.TextXAlignment = Enum.TextXAlignment.Left
+credit.Parent = panel
 
--- On/Off Button
-local onOffButton = Instance.new("TextButton")
-onOffButton.Size = UDim2.new(1, -20, 0, 40)
-onOffButton.Position = UDim2.new(0, 10, 0, 110)
-onOffButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-onOffButton.Text = "ON"
-onOffButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-onOffButton.Font = Enum.Font.SourceSansBold
-onOffButton.TextSize = 18
-onOffButton.Parent = frame
+-- Big orange "Randomize Pets" (shows timer when auto is on)
+local btnRandomize = Instance.new("TextButton")
+btnRandomize.Size = UDim2.new(1, -40, 0, 50)
+btnRandomize.Position = UDim2.new(0, 20, 0, 78)
+btnRandomize.BackgroundColor3 = Color3.fromRGB(255,140,0)
+btnRandomize.TextColor3 = Color3.fromRGB(255,255,255)
+btnRandomize.Font = Enum.Font.GothamBlack
+btnRandomize.TextSize = 22
+btnRandomize.Text = "Randomize Pets"
+btnRandomize.Parent = panel
+Instance.new("UICorner", btnRandomize).CornerRadius = UDim.new(0, 10)
 
--- ESP Toggle Button
-local espButton = Instance.new("TextButton")
-espButton.Size = UDim2.new(1, -20, 0, 40)
-espButton.Position = UDim2.new(0, 10, 0, 160)
-espButton.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-espButton.Text = "ESP: OFF"
-espButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-espButton.Font = Enum.Font.SourceSansBold
-espButton.TextSize = 18
-espButton.Parent = frame
+-- Black ESP button
+local btnESP = Instance.new("TextButton")
+btnESP.Size = UDim2.new(1, -40, 0, 50)
+btnESP.Position = UDim2.new(0, 20, 0, 138)
+btnESP.BackgroundColor3 = Color3.fromRGB(25,25,25)
+btnESP.TextColor3 = Color3.fromRGB(255,255,255)
+btnESP.Font = Enum.Font.GothamBlack
+btnESP.TextSize = 22
+btnESP.Text = "ESP: OFF"
+btnESP.Parent = panel
+Instance.new("UICorner", btnESP).CornerRadius = UDim.new(0, 10)
 
--- Footer Label
-local footer = Instance.new("TextLabel")
-footer.Size = UDim2.new(1, 0, 0, 20)
-footer.Position = UDim2.new(0, 0, 1, -20)
-footer.BackgroundTransparency = 1
-footer.Text = "Made by - Minami"
-footer.TextColor3 = Color3.fromRGB(255, 255, 255)
-footer.Font = Enum.Font.SourceSans
-footer.TextSize = 14
-footer.Parent = frame
+-- Bottom ON / OFF pair (controls Auto Randomizer)
+local btnOn = Instance.new("TextButton")
+btnOn.Size = UDim2.new(0.48, -22, 0, 50)
+btnOn.Position = UDim2.new(0, 20, 1, -62)
+btnOn.BackgroundColor3 = Color3.fromRGB(0,200,0)
+btnOn.TextColor3 = Color3.fromRGB(255,255,255)
+btnOn.Font = Enum.Font.GothamBlack
+btnOn.TextSize = 22
+btnOn.Text = "ON"
+btnOn.Parent = panel
+Instance.new("UICorner", btnOn).CornerRadius = UDim.new(0, 10)
 
--- Countdown Handler
-local function startRandomizer()
-    if randomizerActive then return end
-    randomizerActive = true
-    countdown = math.random(30, 40)
-    sendNotification("Pet Randomizer Started", tostring(countdown).."s")
-    while countdown > 0 and randomizerActive do
-        petButton.Text = "Pet Randomizer ("..countdown.."s)"
-        onOffButton.Text = "Wait ("..countdown.."s)"
-        onOffButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        countdown = countdown - 1
-        task.wait(1)
+local btnOff = Instance.new("TextButton")
+btnOff.Size = UDim2.new(0.48, -22, 0, 50)
+btnOff.Position = UDim2.new(1, - (20 + math.floor((280-40)*0.48)), 1, -62)
+btnOff.BackgroundColor3 = Color3.fromRGB(55,55,55)
+btnOff.TextColor3 = Color3.fromRGB(255,255,255)
+btnOff.Font = Enum.Font.GothamBlack
+btnOff.TextSize = 22
+btnOff.Text = "OFF"
+btnOff.Parent = panel
+Instance.new("UICorner", btnOff).CornerRadius = UDim.new(0, 10)
+
+--==== STATE ===================================================
+
+local espOn = false
+local espInit = false
+
+local autoOn = false         -- overall auto-randomizer enabled?
+local cycleActive = false    -- currently counting down?
+local remaining = 0          -- remaining seconds in the current cycle
+local autoThread = nil
+
+local function setRandomizeText(sec) -- shows countdown on the orange button
+    if sec and sec > 0 then
+        btnRandomize.Text = ("Randomize Pets (%ds)"):format(sec)
+    else
+        btnRandomize.Text = "Randomize Pets"
     end
-    petButton.Text = "Pet Randomizer"
-    onOffButton.Text = "ON"
-    onOffButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-    randomizerActive = false
 end
 
--- Button Functions
-onOffButton.MouseButton1Click:Connect(function()
-    if randomizerActive then
-        sendNotification("Please wait", tostring(countdown).."s remaining")
+--==== ESP LOGIC ===============================================
+
+local function runEspInitAnimation()
+    espInit = true
+    local dots = {".", "..", "...", ".."}
+    local i = 1
+    for t = 1, 30 do
+        if not espInit then return end
+        btnESP.Text = "ESP: Turning On" .. " " .. dots[i]
+        i = i % #dots + 1
+        task.wait(1)
+    end
+    if espInit then
+        espOn, espInit = true, false
+        btnESP.Text = "ESP: ON"
+        notify("ESP", "ESP Enabled", 3)
+    end
+end
+
+btnESP.MouseButton1Click:Connect(function()
+    if not espOn and not espInit then
+        btnESP.Text = "ESP: Turning On ..."
+        notify("ESP", "ESP initializing..", 3)
+        task.spawn(runEspInitAnimation)
+    elseif espInit then
+        notify("ESP", "ESP initializing..", 2)
     else
-        startRandomizer()
+        -- turn OFF
+        espOn, espInit = false, false
+        btnESP.Text = "ESP: OFF"
+        notify("ESP", "ESP Disabled", 3)
     end
 end)
 
-espButton.MouseButton1Click:Connect(function()
-    if espActive then
-        espActive = false
-        espButton.Text = "ESP: OFF"
-        espButton.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-        sendNotification("ESP", "ESP Disabled")
-    else
-        espActive = true
-        espButton.Text = "ESP: ON"
-        espButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-        sendNotification("ESP", "ESP Enabled")
+--==== AUTO RANDOMIZER LOGIC ===================================
+
+local function autoCycle()
+    while autoOn do
+        -- start one cycle
+        remaining = math.random(30, 40)
+        cycleActive = true
+        notify("Randomizer", "Active Randomizer On..", 2)
+        for t = remaining, 1, -1 do
+            if not autoOn then break end
+            remaining = t
+            setRandomizeText(t)
+            task.wait(1)
+        end
+        -- cycle ends
+        cycleActive = false
+        remaining = 0
+        setRandomizeText(nil)
+
+        -- tiny window to allow OFF click between cycles
+        -- (OFF only works in this gap, as requested)
+        for _ = 1, 10 do
+            if not autoOn then break end
+            task.wait(0.05)
+        end
     end
+end
+
+btnOn.MouseButton1Click:Connect(function()
+    if autoOn then
+        if cycleActive then
+            notify("Randomizer", ("Please wait (%ds)"):format(remaining), 2)
+        else
+            notify("Randomizer", "Already ON", 2)
+        end
+        return
+    end
+    autoOn = true
+    btnOn.BackgroundColor3 = Color3.fromRGB(0,255,0)
+    btnOff.BackgroundColor3 = Color3.fromRGB(55,55,55)
+    if not autoThread or coroutine.status(autoThread) == "dead" then
+        autoThread = task.spawn(autoCycle)
+    end
+end)
+
+btnOff.MouseButton1Click:Connect(function()
+    if autoOn and cycleActive then
+        -- OFF not allowed during countdown
+        notify("Randomizer", ("Please wait (%ds)"):format(remaining), 2)
+        return
+    end
+    if autoOn then
+        autoOn = false
+        btnOn.BackgroundColor3 = Color3.fromRGB(0,200,0)
+        btnOff.BackgroundColor3 = Color3.fromRGB(200,50,50)
+        setRandomizeText(nil)
+        notify("Randomizer", "Randomizer Turned Off", 2)
+        task.wait(0.15)
+        btnOff.BackgroundColor3 = Color3.fromRGB(55,55,55)
+    end
+end)
+
+--==== MANUAL "Randomize Pets" BUTTON ==========================
+
+btnRandomize.MouseButton1Click:Connect(function()
+    -- This stays clickable always (even during auto). Put your real randomize logic here.
+    -- For now we just notify so you can see it fires.
+    notify("Randomize Pets", "Manual randomize triggered!", 2)
 end)
