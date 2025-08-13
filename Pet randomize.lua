@@ -1,4 +1,4 @@
---// Pet Randomizer UI (Minami) - matches screenshot layout //--
+--// Pet Randomizer (Minami) - matches layout //--
 
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
