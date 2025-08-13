@@ -1,43 +1,39 @@
---// Minami's Pet Randomizer UI //--
+--// Made by Minami //--
+
 local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- GUI
+-- ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MinamiUI_" .. math.random(1000, 9999)
-screenGui.ResetOnSpawn = false
+screenGui.Name = "PetRandomizer_" .. math.random(1000, 9999)
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
+-- Main Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 250)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -125)
-mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+mainFrame.Size = UDim2.new(0, 350, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BackgroundTransparency = 0.5
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = screenGui
-mainFrame.BackgroundTransparency = 0.05
-mainFrame.ClipsDescendants = true
-mainFrame.AnchorPoint = Vector2.new(0,0)
-mainFrame.ZIndex = 5
-mainFrame.CornerRadius = UDim.new(0, 15)
-Instance.new("UICorner", mainFrame)
 
 -- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
-title.Text = "PET RANDOMIZER"
+title.Text = "PET RANDOMIZER GUI"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextScaled = true
 title.Parent = mainFrame
 
--- Made by
+-- Made by Minami text
 local madeBy = Instance.new("TextLabel")
 madeBy.Size = UDim2.new(1, 0, 0, 20)
-madeBy.Position = UDim2.new(0, 0, 0, 30)
+madeBy.Position = UDim2.new(0, 0, 1, -20)
 madeBy.BackgroundTransparency = 1
 madeBy.Font = Enum.Font.Gotham
 madeBy.Text = "Made by Minami"
@@ -48,130 +44,103 @@ madeBy.Parent = mainFrame
 -- ESP Button
 local espBtn = Instance.new("TextButton")
 espBtn.Size = UDim2.new(0.9, 0, 0, 40)
-espBtn.Position = UDim2.new(0.05, 0, 0, 60)
-espBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 200)
+espBtn.Position = UDim2.new(0.05, 0, 0, 40)
+espBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 espBtn.Font = Enum.Font.GothamBold
 espBtn.Text = "ESP: OFF"
 espBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 espBtn.TextScaled = true
-Instance.new("UICorner", espBtn)
 espBtn.Parent = mainFrame
 
--- Randomizer Label
-local randLabel = Instance.new("TextLabel")
-randLabel.Size = UDim2.new(1, 0, 0, 30)
-randLabel.Position = UDim2.new(0, 0, 0, 110)
-randLabel.BackgroundTransparency = 1
-randLabel.Font = Enum.Font.Gotham
-randLabel.Text = "Pet Randomizer: Idle"
-randLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-randLabel.TextScaled = true
-randLabel.Parent = mainFrame
+-- Pet Randomizer Label
+local petRandomizerLabel = Instance.new("TextLabel")
+petRandomizerLabel.Size = UDim2.new(0.9, 0, 0, 40)
+petRandomizerLabel.Position = UDim2.new(0.05, 0, 0, 90)
+petRandomizerLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+petRandomizerLabel.Font = Enum.Font.GothamBold
+petRandomizerLabel.Text = "Pet Randomizer: OFF"
+petRandomizerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+petRandomizerLabel.TextScaled = true
+petRandomizerLabel.Parent = mainFrame
 
 -- ON Button
 local onBtn = Instance.new("TextButton")
-onBtn.Size = UDim2.new(0.45, 0, 0, 30)
-onBtn.Position = UDim2.new(0.05, 0, 0, 160)
-onBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+onBtn.Size = UDim2.new(0.45, 0, 0, 40)
+onBtn.Position = UDim2.new(0.05, 0, 0, 150)
+onBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 onBtn.Font = Enum.Font.GothamBold
 onBtn.Text = "ON"
 onBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 onBtn.TextScaled = true
-Instance.new("UICorner", onBtn)
 onBtn.Parent = mainFrame
 
 -- OFF Button
 local offBtn = Instance.new("TextButton")
-offBtn.Size = UDim2.new(0.45, 0, 0, 30)
-offBtn.Position = UDim2.new(0.5, 0, 0, 160)
-offBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+offBtn.Size = UDim2.new(0.45, 0, 0, 40)
+offBtn.Position = UDim2.new(0.5, 0, 0, 150)
+offBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 offBtn.Font = Enum.Font.GothamBold
 offBtn.Text = "OFF"
 offBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 offBtn.TextScaled = true
-Instance.new("UICorner", offBtn)
 offBtn.Parent = mainFrame
 
 -- Logic
-local espState = false
-local randActive = false
-local randCooldown = false
+local espOn = false
+local randomizerActive = false
+local randomizerCooldown = false
 
--- ESP Logic
+-- ESP Button Function
 espBtn.MouseButton1Click:Connect(function()
-    if not espState then
-        espState = true
-        StarterGui:SetCore("SendNotification", {
-            Title = "ESP",
-            Text = "ESP initializing...",
-            Duration = 3
-        })
-        espBtn.Text = "ESP: Initializing..."
-        task.spawn(function()
-            for i = 1, 30 do
-                espBtn.Text = "ESP: Initializing" .. string.rep(".", (i % 3) + 1)
-                task.wait(1)
-            end
-            espBtn.Text = "ESP: ON"
-            StarterGui:SetCore("SendNotification", {
-                Title = "ESP",
-                Text = "ESP ON",
-                Duration = 3
-            })
-        end)
-    else
-        espState = false
-        espBtn.Text = "ESP: OFF"
-        StarterGui:SetCore("SendNotification", {
-            Title = "ESP",
-            Text = "ESP OFF",
-            Duration = 3
-        })
-    end
+	if not espOn then
+		StarterGui:SetCore("SendNotification", {Title = "ESP", Text = "ESP Initializing...", Duration = 3})
+		task.delay(3, function()
+			espOn = true
+			espBtn.Text = "ESP: ON"
+			espBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		end)
+	else
+		espOn = false
+		espBtn.Text = "ESP: OFF"
+		espBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	end
 end)
 
--- Randomizer Logic
+-- Randomizer Function
 local function startRandomizer()
-    randActive = true
-    while randActive do
-        local waitTime = math.random(30, 40)
-        randLabel.Text = "Pet Randomizer: " .. waitTime .. "s"
-        StarterGui:SetCore("SendNotification", {
-            Title = "Randomizer",
-            Text = "Active Randomizer On...",
-            Duration = 3
-        })
-        randCooldown = true
-        for t = waitTime, 1, -1 do
-            randLabel.Text = "Pet Randomizer: " .. t .. "s"
-            task.wait(1)
-        end
-        randCooldown = false
-    end
+	randomizerActive = true
+	while randomizerActive do
+		local waitTime = math.random(30, 40)
+		for i = waitTime, 1, -1 do
+			petRandomizerLabel.Text = "Pet Randomizer: " .. i .. "s"
+			task.wait(1)
+		end
+		-- Cycle done (do your pet randomizing logic here)
+	end
 end
 
+-- ON Button
 onBtn.MouseButton1Click:Connect(function()
-    if not randActive then
-        startRandomizer()
-        onBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    end
+	if randomizerCooldown then
+		StarterGui:SetCore("SendNotification", {Title = "Randomizer", Text = "Please wait...", Duration = 2})
+		return
+	end
+	if not randomizerActive then
+		randomizerActive = true
+		onBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		offBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		StarterGui:SetCore("SendNotification", {Title = "Randomizer", Text = "Active Randomizer On...", Duration = 3})
+		task.spawn(startRandomizer)
+	end
 end)
 
+-- OFF Button
 offBtn.MouseButton1Click:Connect(function()
-    if randCooldown then
-        StarterGui:SetCore("SendNotification", {
-            Title = "Randomizer",
-            Text = "Please wait (" .. string.match(randLabel.Text, "%d+") .. "s)",
-            Duration = 2
-        })
-    else
-        randActive = false
-        randLabel.Text = "Pet Randomizer: Idle"
-        onBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-        StarterGui:SetCore("SendNotification", {
-            Title = "Randomizer",
-            Text = "Randomizer Turned Off",
-            Duration = 3
-        })
-    end
+	if randomizerActive then
+		randomizerActive = false
+		petRandomizerLabel.Text = "Pet Randomizer: OFF"
+		onBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		offBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		StarterGui:SetCore("SendNotification", {Title = "Randomizer", Text = "Pet Randomizer Turned Off", Duration = 3})
+	end
 end)
